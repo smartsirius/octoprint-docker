@@ -15,13 +15,17 @@ working hard to make it as compatible as possible. Please check out our [Roadmap
 or join the discussion in the `#dev-docker` or `#support-docker` channels on the official OctoPrint Discord
 [discord.octoprint.org](https://discord.octoprint.org).
 
-**Tags**
+**Tags and platforms**
+
+All images for the `octoprint/octoprint` image are multi-arch images, and we publish for `arm64`, `arm/v7`, and `amd64` using the below tags:
 
 - `latest` - will always follow the latest _stable_ release 
 - `edge` - will always follow the latest release _including prereleases_.
 - `canary` - follows the [OctoPrint/Octoprint@maintenance](https://github.com/OctoPrint/OctoPrint/tree/maintenance) branch
 - `bleeding`- follows the [OctoPrint/Octoprint@devel](https://github.com/OctoPrint/OctoPrint/tree/devel) branch
 - `X`,`X.Y`,`X.Y.Z`,`X.Y.Z-rc` - these tags will follow the latest build that matches the tag
+- `minimal` - This is built whenever `latest` is built, but uses the [minimal image](docs/using_the_minimal_image.md)
+- `latest|edge|canary|bleeding|X.Y.Z-minimal` - a minimal version of each of the tags described above, published under the same condition but from the [minimal image](docs/using_the_minimal_image.md)
 
 **Table of Contents**
 - [OctoPrint-docker ![Chat](https://discord.octoprint.org)](#octoprint-docker-)
@@ -29,9 +33,10 @@ or join the discussion in the `#dev-docker` or `#support-docker` channels on the
     - [Configuration](#configuration)
       - [Enabling Webcam Support with Docker](#enabling-webcam-support-with-docker)
       - [Container Environment based configs](#container-environment-based-configs)
+      - [Restarting OctoPrint](#restarting-octoprint)
       - [Editing Config files manually](#editing-config-files-manually)
   - [Without docker-compose](#without-docker-compose)
-  - [Building the image yourself](#building-the-image-yourself)
+  - [Building your own OctoPrint Image](docs/README.md#building-your-own-octoprint-image)
   - [Contributions Welcome](#contributions-welcome)
 
 ## Usage
@@ -73,7 +78,7 @@ and if you wish to change them, refer to the docker-compose docs on setting envi
 | variable | default | description |
 | -------- | ------- | ----------- |
 | `CAMERA_DEV` | `/dev/video0` | (see [note](#devices_note)) |
-| `MJPG_STREAMER_INPUT` | `-y -n -r 640x480` | params for mjpg-streamer |
+| `MJPG_STREAMER_INPUT` | `-n -r 640x480` | params for mjpg-streamer |
 | `ENABLE_MJPG_STREAMER` | `false` | enable or disable mjpg-streamer
 | `AUTOMIGRATE` | `false` | Will attempt to detect and migrate filesystems structures from previous versions of this image to be compatible with the latest release version. recommend you backup before trying this as this is a new feature that has been difficult to test fully |
 
@@ -83,6 +88,14 @@ service, whereas the `devices` mapping is used by docker to make sure the contai
 
 For example, if you change the `CAMERA_DEV` to be `/dev/video1`, you would also need to map `/dev/video1:/dev/video1`
 in your container.
+
+#### Restarting OctoPrint
+
+Whilst the container should be pre-configured to allow for OctoPrint to be restarted within the container, there are still some edge cases where this pre-configuration does not take effect. If the option to restart OctopPrint is not present in the user interface, ensure the following command is present in the `Restart OctoPrint` field under the Server section of the OctoPrint Settings.
+
+```text
+s6-svc -r /var/run/s6/services/octoprint
+```
 
 #### Editing Config files manually
 
@@ -124,9 +137,11 @@ docker run -d -v octoprint:/octoprint --device /dev/ttyACM0:/dev/ttyACM0 --devic
 [code-server]: https://github.com/cdr/code-server
 [vscode]: https://code.visualstudio.com
 
-## Building the image yourself
+## Extended Documentation
 
-If you would like to build the docker image yourself, please read [docs/building-an-octoprint-image](docs/building-an-octoprint-image.md)
+We are in the process of creating more extensive documentation for using the octoprint/octprint image. Check out the [docs](docs/README.md)
+
+If you would like to build the docker image yourself, please read [building-an-octoprint-image](docs/README.md#building-your-own-octoprint-image)
 
 ## Contributions Welcome
 
